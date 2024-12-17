@@ -10,11 +10,8 @@ Easysploit server is now working on https://easysploit.rocknroll17.com.
 - Anti-Virus Evasion
 
 ## Installation
-```
-git clone https://github.com/Easysploit/easysploit-server.git  
-cd easysploit-server  
-pip install -r requirements.txt
-```
+You don't need to run this server.
+It is already working on https://easysploit.rocknroll17.com.
 
 ## Usage
 ### Available Endpoints
