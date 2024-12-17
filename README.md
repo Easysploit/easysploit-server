@@ -3,10 +3,10 @@
 Easysploit Server is a tool designed to generate, customize, and manage Metasploit reverse_tcp payloads. It simplifies exploitation with built-in admin privilege escalation, and AV evasion capabilities, supporting fileless execution for fast, undetectable operations.
 
 ## Features
-Custom Reverse_TCP Payloads
-Admin Privilege Escalation
-Fileless Execution (Memory-based)
-Anti-Virus Evasion
+- Custom Reverse_TCP Payloads
+- Admin Privilege Escalation
+- Fileless Execution (Memory-based)
+- Anti-Virus Evasion
 
 ## Installation
 ```
