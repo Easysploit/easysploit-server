@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
-import subprocess
 import io
 from Data.data import PayloadInfo
 import ipaddress
@@ -21,14 +20,14 @@ def is_valid_port(port: int) -> bool:
         return InvalidPortNumber(port)
     return True
 
-@router.post("/python/meterpreter/reverse_tcp", tags=["python"])
-async def generate_payload(info:PayloadInfo):
+@router.post("/python/meterpreter/reverse_tcp", tags=["python"], responses={200: {"content": {"application/octet-stream": {"example": PayloadGeneratorService.generate_payload("LHOST", "LPORT")}}}}, response_class=StreamingResponse)
+async def generate_standard_payload(info:PayloadInfo):
     try:
         is_valid_ip(info.LHOST)
         is_valid_port(info.LPORT)
         payload = PayloadGeneratorService.generate_payload(info.LHOST, info.LPORT)
         payload = io.BytesIO(payload.encode('utf-8'))
-        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'})
+        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'}, status_code=200)
     except InvalidIpAddress as e:
         raise HTTPException(status_code=400, detail=e.message)
     except InvalidPortNumber as e:
@@ -36,14 +35,14 @@ async def generate_payload(info:PayloadInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
     
-@router.post("/python/meterpreter/reverse_tcp/admin", tags=["python"])
-async def generate_payload(info:PayloadInfo):
+@router.post("/python/meterpreter/reverse_tcp/admin", tags=["python"], responses={200: {"content": {"application/octet-stream": {"example": PayloadGeneratorService.generate_admin_payload("LHOST", "LPORT")}}}}, response_class=StreamingResponse)
+async def generate_admin_payload(info:PayloadInfo):
     try:
         is_valid_ip(info.LHOST)
         is_valid_port(info.LPORT)
         payload = PayloadGeneratorService.generate_admin_payload(info.LHOST, info.LPORT)
         payload = io.BytesIO(payload.encode('utf-8'))
-        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'})
+        return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'}, status_code=200)
     except InvalidIpAddress as e:
         raise HTTPException(status_code=400, detail=e.message)
     except InvalidPortNumber as e:
