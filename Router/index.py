@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 import markdown
 import os
 
-router = APIRouter()
+router = APIRouter(tags=["README.md"])
 
 @router.get("/", response_class=HTMLResponse)
 async def serve_markdown_page():

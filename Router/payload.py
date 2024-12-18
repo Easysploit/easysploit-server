@@ -21,7 +21,7 @@ def is_valid_port(port: int) -> bool:
         return InvalidPortNumber(port)
     return True
 
-@router.post("/python/meterpreter/reverse_tcp")
+@router.post("/python/meterpreter/reverse_tcp", tags=["python"])
 async def generate_payload(info:PayloadInfo):
     try:
         is_valid_ip(info.LHOST)
@@ -36,7 +36,7 @@ async def generate_payload(info:PayloadInfo):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
     
-@router.post("/python/meterpreter/reverse_tcp/admin")
+@router.post("/python/meterpreter/reverse_tcp/admin", tags=["python"])
 async def generate_payload(info:PayloadInfo):
     try:
         is_valid_ip(info.LHOST)
@@ -50,4 +50,4 @@ async def generate_payload(info:PayloadInfo):
         raise HTTPException(status_code=400, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
-    
+
