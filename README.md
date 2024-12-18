@@ -10,13 +10,13 @@ Easysploit server is now working on https://easysploit.rocknroll17.com.
 - Anti-Virus Evasion
 
 ## Scenario
-1. **Generate Exploit Code using easysploit-client**
+1. **Generate Exploit Code using easysploit-client**  
 Use easysploit-client to generate the exploit code. The generated code requests a payload from easysploit-server and executes it in a fileless manner.
-2. **Embed the Exploit Code**
+2. **Embed the Exploit Code**  
 Insert the generated exploit code into other repositories or Python code to be executed on the target system.
-3. **Execute on Target System**
+3. **Execute on Target System**  
 When the exploit code is executed on the target system, it sends a request to easysploit-server for the payload.
-4. **Fileless Execution**
+4. **Fileless Execution**  
 The easysploit-server delivers the payload and executes it filelessly in memory without leaving traces on the disk.
 
 ## Installation
