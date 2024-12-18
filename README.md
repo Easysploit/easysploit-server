@@ -30,7 +30,7 @@ Endpoint: `/python/meterpreter/reverse_tcp`
 2. **Admin Privilege Reverse TCP Payload**
 Endpoint: `/python/meterpreter/reverse_tcp/admin`
   
-You can try this requests in https://easysploit.rocknroll17.com/docs
+You can try these request in https://easysploit.rocknroll17.com/docs
 
 ### Request Body
 Both endpoints require the same JSON payload:
