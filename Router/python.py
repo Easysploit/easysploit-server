@@ -49,4 +49,3 @@ async def generate_admin_payload(info:PayloadInfo):
         raise HTTPException(status_code=400, detail=e.message)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"There was an error while generating the payload.")
-
