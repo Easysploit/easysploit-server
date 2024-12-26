@@ -27,9 +27,10 @@ async def generate_standard_payload(info:PayloadInfo, request: Request):
         is_valid_port(info.LPORT)
         payload = PayloadGeneratorService.generate_payload(info.LHOST, info.LPORT)
         payload = io.BytesIO(payload.encode('utf-8'))
-        from Service.user_socket import exploit_start
-        exploit_start(info.LHOST, request.client.host)
-
+        from Service.user_socket import exploit_start, find_socket
+        if find_socket(request.client.host):
+            payload_type = str(request.url).replace("https://easysploit.rocknroll17.com/", "")
+            exploit_start(info.LHOST, info.LPORT, request.client.host, payload_type) 
         return StreamingResponse(payload, media_type='application/octet-stream', headers={'Content-Type': 'text/x-python'}, status_code=200)
     except InvalidIpAddress as e:
         raise HTTPException(status_code=400, detail=e.message)
