@@ -31,7 +31,7 @@ def additional_cleanup():
 atexit.register(additional_cleanup)
 
 async def run_uvicorn():
-    config = Config("main:app", host="0.0.0.0", port=44444, workers=4)
+    config = Config("main:app", host="0.0.0.0", port=44444, workers=4, log_config="logging_config.json")
     server = Server(config)
     await server.serve()
 

