@@ -26,7 +26,7 @@ def exploit_start(ip: str, port:int, client_ip: str, payload: str):
     socket = client_sockets.get(ip)
     conversation(socket, Data("Info", f"Payload request received from {client_ip}."), "OK")
     conversation(socket, Data("Info", "Start opening reverse_tcp session."), "OK")
-    if answer := conversation_with_exploit_info(socket, Data("Exploit Info", f"Payload: {payload}\\IP: {client_ip}\\Port: {port}")):
+    if (answer := conversation_with_exploit_info(socket, Data("Exploit Info", f"Payload: {payload}\\IP: {client_ip}\\Port: {port}"))) != "OK":
         if answer == "Exist":
             print("Session already exists.")
             return True

